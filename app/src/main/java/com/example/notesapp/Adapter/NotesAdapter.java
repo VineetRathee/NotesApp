@@ -94,8 +94,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.notesViewHol
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Uri.parse(note.image) != null)
-                    showImage(Uri.parse(note.image));
+                if (note.image != null) {
+                    if (Uri.parse(note.image) != null)
+                        showImage(Uri.parse(note.image));
+                }
             }
         });
 
