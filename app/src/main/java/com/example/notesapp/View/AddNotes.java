@@ -26,6 +26,7 @@ import com.example.notesapp.Model.Notes;
 import com.example.notesapp.R;
 import com.example.notesapp.ViewModel.NotesViewModel;
 import com.example.notesapp.databinding.ActivityAddNotesBinding;
+import com.example.notesapp.utils.AdapterUtils;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -117,7 +118,7 @@ public class AddNotes extends AppCompatActivity {
                 }
                 else
                 {
-                    startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
+                    startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
 
                 }
             }
@@ -197,7 +198,7 @@ public class AddNotes extends AppCompatActivity {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 Toast.makeText(this, "storage permission granted", Toast.LENGTH_LONG).show();
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
             }
             else
             {
@@ -213,8 +214,8 @@ public class AddNotes extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
-            imageUri=NotesAdapter.getImageUri(this,photo).toString();
-            Picasso.get().load(NotesAdapter.getImageUri(this,photo)).error(R.drawable.placeholder).centerCrop().fit().into(binding.uploadedImageView);
+            imageUri= AdapterUtils.getImageUri(this,photo).toString();
+            Picasso.get().load(AdapterUtils.getImageUri(this,photo)).error(R.drawable.placeholder).centerCrop().fit().into(binding.uploadedImageView);
            // binding.uploadedImageView.setImageBitmap(photo);
         }
         else if(requestCode==GET_FROM_GALLERY&& resultCode == Activity.RESULT_OK){

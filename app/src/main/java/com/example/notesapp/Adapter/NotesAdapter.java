@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.notesapp.View.MainActivity;
 import com.example.notesapp.Model.Notes;
 import com.example.notesapp.R;
+import com.example.notesapp.utils.AdapterUtils;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -82,9 +83,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.notesViewHol
             @Override
             public void onClick(View view) {
                 if (note.image != null)
-                    onShareItem(note.notesTitle, holder.image);
+                    AdapterUtils.onShareItem(note.notesTitle, holder.image,mainActivity);
                 else {
-                    onShareItem(note.notesTitle, null);
+                    AdapterUtils.onShareItem(note.notesTitle, null,mainActivity);
                 }
             }
 
@@ -101,12 +102,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.notesViewHol
 
     }
 
-    public static Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title"+"-"+System.currentTimeMillis(), null);
-        return Uri.parse(path);
-    }
+
 
     @Override
     public int getItemCount() {
@@ -130,44 +126,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.notesViewHol
     }
 
 
-    /**
-     * @param title,ivImage
-     * This method is used to share the image and the title to any other app
-     */
-    public void onShareItem(String title, ImageView ivImage) {
-        // Get access to bitmap image from view
-        // Get access to the URI for the bitmap
-        if (ivImage != null) {
-            BitmapDrawable drawable = (BitmapDrawable) ivImage.getDrawable();
-            Bitmap bitmap = drawable.getBitmap();
-            Uri bmpUri = getImageUri(mainActivity,bitmap);
-            if (bmpUri != null) {
-                // Construct a ShareIntent with link to image
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, title);
-                shareIntent.setType("image/*");
-                // Launch sharing dialog for image
-                mainActivity.startActivity(Intent.createChooser(shareIntent, "Share Notes"));
-
-            } else {
-
-            }
-        } else {
-            //in case if image is not available
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, title);
-            shareIntent.setType("text/plain");
-            // Launch sharing dialog for image
-            mainActivity.startActivity(Intent.createChooser(shareIntent, "Share Notes"));
-
-        }
-
-    }
     /**
      * @param uri
      * This method is used to show the dialogue box to show image
