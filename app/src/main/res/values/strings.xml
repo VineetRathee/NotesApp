@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">NotesApp</string>
+    <string name="add_title">Title...</string>
+    <string name="add_notes">Notes...</string>
+    <string name="upload_image">Upload Image(Optional)</string>
+    <string name="upload_video">Upload Video(Optional)</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="video">Video</string>
+    <string name="splash_app_name">Notes App</string>
+    <string name="preview_image">Image Preview</string>
+    <string name="heading_title">Title : </string>
+    <string name="heading_notes">Notes : </string>
+    <string name="heading_attachment">Attachments : </string>
+    <string name="description">notes description : </string>
+
+
+
+</resources>
