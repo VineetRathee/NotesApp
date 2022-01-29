@@ -3,7 +3,6 @@ package com.example.notesapp.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.Manifest;
@@ -11,17 +10,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.Toast;
 
-import com.example.notesapp.Adapter.NotesAdapter;
 import com.example.notesapp.Model.Notes;
 import com.example.notesapp.R;
 import com.example.notesapp.ViewModel.NotesViewModel;
@@ -29,14 +24,12 @@ import com.example.notesapp.databinding.ActivityAddNotesBinding;
 import com.example.notesapp.utils.AdapterUtils;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 /**
  * @author Vineet
  * Date: 1st November, 2021
  * AddNotes Create notes which will be stored in database
  */
+@SuppressWarnings("deprecation")
 public class AddNotes extends AppCompatActivity {
     ActivityAddNotesBinding binding;
     String title, note , stringUri,imageUri;
@@ -44,10 +37,11 @@ public class AddNotes extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
     private static final int  MY_VIDEO_CAMERA_PERMISSION_CODE = 200;
-    public static final int GET_FROM_GALLERY = 3;
-    static final int REQUEST_VIDEO_CAPTURE = 1;
-    static final int GET_VIDEO_FROM_GALLERY = 2;
+    private static final int GET_FROM_GALLERY = 3;
+    private static final int REQUEST_VIDEO_CAPTURE = 1;
+    private static final int GET_VIDEO_FROM_GALLERY = 2;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,71 +50,55 @@ public class AddNotes extends AppCompatActivity {
         notesViewModel = ViewModelProviders.of(this).get(NotesViewModel.class);
         binding.scroll.smoothScrollTo(0,0);
        /* on click listener to click image from camera */
-        binding.cameraConstraintLayout.setOnClickListener(new View.OnClickListener()
-        {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v)
+        binding.cameraConstraintLayout.setOnClickListener(v -> {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
             {
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                {
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-                }
-                else
-                {
-                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-                }
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+            }
+            else
+            {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
         });
         /* on click listener to choose image from gallery*/
-        binding.galleryConstraintLayout.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GET_FROM_GALLERY);
-                }
-                else
-                {
-                    startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
-
-                }
+        binding.galleryConstraintLayout.setOnClickListener(v -> {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GET_FROM_GALLERY);
+            }
+            else
+            {
+                Intent imagePickerIntent = new Intent(Intent.ACTION_PICK);
+                imagePickerIntent.setType("image/*");
+                startActivityForResult(imagePickerIntent, GET_FROM_GALLERY);
             }
         });
         /* on click listener to shoot video from camera*/
-        binding.videoConstraintLayout.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                {
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_VIDEO_CAMERA_PERMISSION_CODE);
-                }
-                else
-                {
-                    Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                    if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
-                    }
+        binding.videoConstraintLayout.setOnClickListener(v -> {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_VIDEO_CAMERA_PERMISSION_CODE);
+            }
+            else
+            {
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                 }
             }
         });
         /* on click listener to choose video from gallery*/
-        binding.videoGalleryConstraintLayout.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                {
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GET_VIDEO_FROM_GALLERY);
-                }
-                else
-                {
-                    startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
-
-                }
+        binding.videoGalleryConstraintLayout.setOnClickListener(v -> {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+            {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GET_VIDEO_FROM_GALLERY);
+            }
+            else
+            {
+                Intent videoPickerIntent = new Intent(Intent.ACTION_PICK);
+                videoPickerIntent.setType("video/*");
+                startActivityForResult(videoPickerIntent, GET_VIDEO_FROM_GALLERY);
             }
         });
 
@@ -150,7 +128,6 @@ public class AddNotes extends AppCompatActivity {
         newNote.video= stringUri;
         notesViewModel.insertNote(newNote);
         finish();
-
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
@@ -173,7 +150,9 @@ public class AddNotes extends AppCompatActivity {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 Toast.makeText(this, "storage permission granted", Toast.LENGTH_LONG).show();
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+                Intent imagePickerIntent = new Intent(Intent.ACTION_PICK);
+                imagePickerIntent.setType("image/*");
+                startActivityForResult(imagePickerIntent, GET_FROM_GALLERY);
             }
             else
             {
@@ -198,7 +177,9 @@ public class AddNotes extends AppCompatActivity {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
             {
                 Toast.makeText(this, "storage permission granted", Toast.LENGTH_LONG).show();
-                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI), GET_VIDEO_FROM_GALLERY);
+                Intent videoPickerIntent = new Intent(Intent.ACTION_PICK);
+                videoPickerIntent.setType("video/*");
+                startActivityForResult(videoPickerIntent, GET_VIDEO_FROM_GALLERY);
             }
             else
             {
@@ -216,7 +197,6 @@ public class AddNotes extends AppCompatActivity {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageUri= AdapterUtils.getImageUri(this,photo).toString();
             Picasso.get().load(AdapterUtils.getImageUri(this,photo)).error(R.drawable.placeholder).centerCrop().fit().into(binding.uploadedImageView);
-           // binding.uploadedImageView.setImageBitmap(photo);
         }
         else if(requestCode==GET_FROM_GALLERY&& resultCode == Activity.RESULT_OK){
             Uri selectedImage = data.getData();
@@ -237,8 +217,8 @@ public class AddNotes extends AppCompatActivity {
                 binding.uploadedVideoView.setZOrderOnTop(true);
                 binding.uploadedVideoView.start();
            }
-            catch (Exception e){
-
+            catch (Exception e) {
+                e.printStackTrace();
             }
 
         }
@@ -251,8 +231,8 @@ public class AddNotes extends AppCompatActivity {
                 binding.uploadedVideoView.setZOrderOnTop(true);
                 binding.uploadedVideoView.start();
             }
-            catch (Exception e){
-
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

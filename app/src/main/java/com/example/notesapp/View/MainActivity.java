@@ -3,7 +3,6 @@ package com.example.notesapp.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,7 +28,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     NotesViewModel notesViewModel;
-    RecyclerView notesRecyclerView;
     NotesAdapter notesAdapter;
     List<Notes> searchList = new ArrayList<>();
 
@@ -39,27 +37,17 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         notesViewModel = ViewModelProviders.of(this).get(NotesViewModel.class);
-        notesRecyclerView = findViewById(R.id.recycler);
 
-
-        binding.newNotes.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, AddNotes.class));
-        });
+        binding.recycler.setLayoutManager(new LinearLayoutManager(this));
+        notesAdapter = new NotesAdapter(MainActivity.this);
+        binding.recycler.setAdapter(notesAdapter);
+        binding.newNotes.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, AddNotes.class)));
 
         notesViewModel.getAllNotes.observe(this, notes -> {
-            setNotesAdapter(notes);
-            searchList = notes;
+           notesAdapter.addNotes(notes);
+           searchList=notes;
         });
 
-    }
-    /**
-     * @param notes
-     * It set the notes adapter
-     */
-    public void setNotesAdapter(List<Notes> notes){
-        notesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        notesAdapter = new NotesAdapter(MainActivity.this,notes);
-        notesRecyclerView.setAdapter(notesAdapter);
     }
     /**
      * @param menu
@@ -97,6 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 searchList.add(note);
             }
         }
-        this.notesAdapter.searchNotes(searchList);
+        notesAdapter.addNotes(searchList);
     }
 }

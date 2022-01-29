@@ -1,11 +1,7 @@
 package com.example.notesapp.Adapter;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +21,6 @@ import com.example.notesapp.R;
 import com.example.notesapp.utils.AdapterUtils;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -36,22 +31,18 @@ import java.util.List;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.notesViewHolder> {
 
     MainActivity mainActivity;
-    List<Notes> notes;
-    List<Notes> notesList;
+    List<Notes> notes = new ArrayList<>();
 
-    public NotesAdapter(MainActivity mainActivity, List<Notes> notes) {
+    public NotesAdapter(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        this.notes = notes;
-        this.notesList= new ArrayList<>(notes);
     }
-    /**
-     * @param searchedNotes
-     * It notify that data set is changed
-     */
-    public void searchNotes(List<Notes> searchedNotes){
-        this.notes = searchedNotes;
+
+
+    public void addNotes(List<Notes> addNotes){
+        this.notes.clear();
+        this.notes.addAll(addNotes);
         notifyDataSetChanged();
-    }
+  }
 
     @NonNull
     @Override
